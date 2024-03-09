@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { registerUser } from "../controllers/user.controllers.js";
+import { loginUser, logoutUser, refreshAccessToken, registerUser } from "../controllers/user.controllers.js";
 import { upload } from "../middlewares/multer.middleware.js"
+import { verifyJWT } from "../middlewares/auth.middleware.js";
 
 
 const router = Router()
@@ -16,5 +17,11 @@ router.route("/register").post(upload.fields([
         maxCount: 1
     }
 ]),registerUser)
+
+router.route("/login").post(loginUser)
+
+router.route("/logout").post(verifyJWT,logoutUser)
+
+router.route("/refresh-token").post(refreshAccessToken)
 
 export default router // default mai jab bhi export karaigai toh hum apna mancha naam rhk sktai hai jaise ki hum app.js mai userRoute lekha hua hai
