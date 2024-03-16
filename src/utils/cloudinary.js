@@ -26,6 +26,21 @@ const uploadOnCloudinary = async (localFilePath) =>{
     }
 }
 
+const deleteOnCloudinary = async(url,resource_type) =>{
+    const parts = url.split('/');
 
+    const idWithExtension = parts[parts.length - 1];
 
-export { uploadOnCloudinary }
+    const id = idWithExtension.split('.')[0];
+
+    try {
+        if(!id) return null;
+        const response = await cloudinary.api.delete_resources([id],{"resource_type": resource_type});
+        return response;
+
+    } catch (error) {
+        return null;
+    }
+}
+
+export { uploadOnCloudinary ,deleteOnCloudinary}
