@@ -12,6 +12,36 @@ const getVideoComments = asyncHandler(async (req, res) => {
     const {videoId} = req.params
     const {page = 1, limit = 10} = req.query
 
+    if(!videoId) {
+        throw new ApiError(404, "comment is required")
+    }
+
+    await verifyComment(videoId);
+
+    const pageNumber = parseInt(page);
+    const limitNumber = parseInt(limit);
+
+    const skip = (pageNumber - 1) * limitNumber;
+
+    const comments = await Comment.find({video: videoId}).skip(skip).limit(limitNumber);
+
+    if(!(comments)){
+        throw new ApiError(500, "Something went wrong getting comments")
+    }
+
+    const totalComments = await Comment.countDocuments({video: videoId});
+
+    const totalPages = Math.ceil(totalComments / limitNumber);
+
+    res
+    .status(200)
+    .json(new ApiResponse(200, {
+        page: pageNumber,
+        limit: limitNumber,
+        totalComments: totalComments,
+        totalPages: totalPages,
+        data: comments
+    }))
 })
 
 async function verifyComment(commentId) {
